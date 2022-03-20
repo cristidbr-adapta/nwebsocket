@@ -17,7 +17,7 @@ Motivation
 There are many asynchronous Python WebSocket client packages out there, and 
 almost of them require your code to use the async syntax. This one does not, 
 so it's easier to use from within a Jupyter Notebook. All of the async code 
-is executed within a separate thread.
+is executed onto a separate thread.
 
 Guideline
 =========
@@ -30,6 +30,22 @@ your task will be to:
 - implement the TX/RX specification for working with the endpoint
 - isolate the callback pattern from the rest of your code
 
+
+Take a chat service as an example, there are operations which are following 
+the traditional request/response pattern such as posting messages, and there 
+are other messages which are received without issuing a request (chat posting 
+by other users).
+
+These latter messages must be handled by your code as soon as they are received. 
+Class instances can help with that, by storing the received information (chat 
+posts). Keep your callbacks short, fast adn serializable.
+
+
+Limitations
+===========
+
+This library is not suitable for high throughput, as the queue mechanism in Python 
+is notoriously slow due to serialization.
 
 Installation
 ============
@@ -54,7 +70,7 @@ A simple minimal API interface can be created using the following example.
     # minimal.py
     from nwebsocket import WebSocket 
 
-    wscn = new WebSocket( "ws://localhost:8001" )
+    wscn = WebSocket( "ws://localhost:8001" )
 
     wscn.onmessage = lambda m: print( m )
     wscn.onopen = lambda: print( "Opened connection" )
