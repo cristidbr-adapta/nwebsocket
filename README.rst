@@ -7,7 +7,7 @@ Inspiration
 ===========
 
 This package was inspired by the ultra-simple WebSocket API in the JavaScript 
-language which it attempts to replicate. 
+language which it replicates. 
 
 https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/url
 
