@@ -3,14 +3,6 @@ nwebsocket
 
 Python package for simple and easy to use WebSocket clients without async. 
 
-Inspiration 
-===========
-
-This package was inspired by the ultra-simple WebSocket API in the JavaScript 
-language which it replicates. 
-
-https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/url
-
 Motivation
 ==========
 
@@ -18,34 +10,6 @@ There are many asynchronous Python WebSocket client packages out there, and
 almost of them require your code to use the async syntax. This one does not, 
 so it's easier to use from within a Jupyter Notebook. All of the async code 
 is executed onto a separate thread.
-
-Guideline
-=========
-
-Since the callback-style API is quite unusual when it comes to pythonicity,
-your task will be to:
-
-- define **onmessage**, **onopen**, **onclose** and **onerror**
-- handle reconnection/s
-- implement the TX/RX specification for working with the endpoint
-- isolate the callback pattern from the rest of your code
-
-
-Take a chat service as an example, there are operations which are following 
-the traditional request/response pattern such as posting messages, and there 
-are other messages which are received without issuing a request (chat posting 
-by other users).
-
-These latter messages must be handled by your code as soon as they are received. 
-Class instances can help with that, by storing the received information (chat 
-posts). Keep your callbacks short, fast adn serializable.
-
-
-Limitations
-===========
-
-This library is not suitable for high throughput, as the queue mechanism in Python 
-is notoriously slow due to serialization.
 
 Installation
 ============
@@ -78,6 +42,45 @@ A simple minimal API interface can be created using the following example.
     wscn.onerror = lambda: print( "Connection errored out" )
 
     print( wscn.readyState )
+
+
+Inspiration 
+===========
+
+This package was inspired by the ultra-simple WebSocket API in the JavaScript 
+language which it replicates. 
+
+https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/url
+
+
+Guideline
+=========
+
+Since the callback-style API is quite unusual when it comes to pythonicity,
+your task will be to:
+
+- define **onmessage**, **onopen**, **onclose** and **onerror**
+- handle reconnection/s
+- implement the TX/RX specification for working with the endpoint
+- isolate the callback pattern from the rest of your code
+
+
+Take a chat service as an example, there are operations which are following 
+the traditional request/response pattern such as posting messages, and there 
+are other messages which are received without issuing a request (chat posting 
+by other users).
+
+These latter messages must be handled by your code as soon as they are received. 
+Class instances can help with that, by storing the received information (chat 
+posts). Keep your callbacks short, fast and serializable.
+
+
+Limitations
+===========
+
+This library is not suitable for high throughput, as the queue mechanism in Python 
+is notoriously slow due to serialization.
+
 
 License (MIT)
 =============
