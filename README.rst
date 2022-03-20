@@ -1,7 +1,7 @@
 nwebsocket 
 ##########
 
-Python package for simple and easy to use WebSockets.
+Python package for simple and easy to use WebSocket clients without async. 
 
 Inspiration 
 ===========
@@ -10,6 +10,26 @@ This package was inspired by the ultra-simple WebSocket API in the JavaScript
 language which it replicates. 
 
 https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/url
+
+Motivation
+==========
+
+There are many asynchronous Python WebSocket client packages out there, and 
+almost of them require your code to use the async syntax. This one does not, 
+so it's easier to use from within a Jupyter Notebook. All of the async code 
+is executed within a separate thread.
+
+Guideline
+=========
+
+Since the callback-style API is quite unusual when it comes to pythonicity,
+your task will be to:
+
+- define **onmessage**, **onopen**, **onclose** and **onerror**
+- handle reconnection/s
+- implement the TX/RX specification for working with the endpoint
+- isolate the callback pattern from the rest of your code
+
 
 Installation
 ============
