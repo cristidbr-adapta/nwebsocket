@@ -32,8 +32,16 @@ A simple minimal API interface can be created using the following example.
 .. code:: python
 
     # minimal.py
-    import nwebsocket
+    from nwebsocket import WebSocket 
 
+    wscn = new WebSocket( "ws://localhost:8001" )
+
+    wscn.onmessage = lambda m: print( m )
+    wscn.onopen = lambda: print( "Opened connection" )
+    wscn.onclose = lambda: print( "Closed connection" )
+    wscn.onerror = lambda: print( "Connection errored out" )
+
+    print( wscn.readyState )
 
 License (MIT)
 =============
