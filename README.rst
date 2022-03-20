@@ -6,10 +6,8 @@ Python package for simple and easy to use WebSockets.
 Inspiration 
 ===========
 
-This package was inspired by the ultra-simple WebSocket API of the JavaScript 
-language and shamelessly copied. 
-
-https://developer.mozilla.org/en-US/docs/Web/API/WebSocket
+This package was inspired by the ultra-simple WebSocket API in the JavaScript 
+language which it attempts to replicate. 
 
 Installation
 ============
