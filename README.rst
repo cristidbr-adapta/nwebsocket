@@ -85,6 +85,7 @@ is notoriously slow due to serialization.
 License (MIT)
 =============
 
-Copyright (C) 2022 `Adapta Robotics`_ .
+Copyright (C) 2022 `Adapta Robotics`_ | `MATT Robot`_ .
 
-.. _Adapta Robotics: https://adaptarobotics.com 
+.. _MATT Robot: https://adaptarobotics.com
+.. _Adapta Robotics: https://adaptarobotics.com  
