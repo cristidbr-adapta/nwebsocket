@@ -22,7 +22,7 @@ Install using pip
 Python version
 --------------
 
-Python 3.6+ is required.
+Python 3.7+ is required.
 
 Usage
 =====
