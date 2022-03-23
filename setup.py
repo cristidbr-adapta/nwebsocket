@@ -10,8 +10,9 @@ except ImportError:
 dirname = os.path.dirname(__file__)
 readme_filename = os.path.join(dirname, 'README.rst')
 
-description = 'Node-like Websockets for Python'
+description = 'WebSocket client without async'
 long_description = description
+
 if os.path.exists(readme_filename):
     readme_content = codecs.open(readme_filename, encoding='utf-8').read()
     long_description = readme_content
@@ -30,6 +31,5 @@ setup(name='nwebsocket',
           'curio',
           'wsproto'
       ],
-      test_suite='nose.collector',
-      tests_require=['nose'],
+      tests_require=['pytest'],
       zip_safe=False)

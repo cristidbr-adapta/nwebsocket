@@ -87,5 +87,5 @@ License (MIT)
 
 Copyright (C) 2022 `Adapta Robotics`_ | `MATT Robot`_ .
 
-.. _MATT Robot: https://adaptarobotics.com
+.. _MATT Robot: https://mattrobot.ai
 .. _Adapta Robotics: https://adaptarobotics.com  
