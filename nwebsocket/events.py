@@ -118,13 +118,14 @@ async def ws_socket_manage(rx_queue, tx_queue, uri, callback):
     """
 
     endpoint = uriparse(uri)
+    secure = ( endpoint['port'] == 443 ) or endpoint.startswith( 'wss:' )
 
     # let tx_queue be nonlocal and sleep
     def send(m): return tx_queue.put(m) and time.sleep(1e-5)
     
     # open socket connection
     try:
-        socket = await curio.open_connection(endpoint['host'], endpoint['port'], ssl=False)
+        socket = await curio.open_connection(endpoint['host'], endpoint['port'], ssl=secure )
     except BaseException:
         callback(RejectConnection(400), send)
         return None

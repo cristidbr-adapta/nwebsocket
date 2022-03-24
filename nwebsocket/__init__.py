@@ -66,7 +66,7 @@ class WebSocket(object):
             self.rx_queue,
             self.tx_queue,
             self.uri,
-            lambda m, s: self.handleRXEvent(m, s)
+            lambda m, s: self.handleRXEvent(m, s),
         )
 
         if(self.detach):
