@@ -1,6 +1,10 @@
 nwebsocket 
 ##########
 
+.. image:: https://github.com/cristidbr-adapta/nwebsocket/actions/workflows/CI.yml/badge.svg
+    :target: https://github.com/cristidbr-adapta/nwebsocket/actions/workflows/CI.yml
+    :alt: Continuous Integration
+
 .. image:: https://codecov.io/gh/cristidbr-adapta/nwebsocket/branch/main/graph/badge.svg?token=0ZXGWE8SQZ
     :target: https://codecov.io/gh/cristidbr-adapta/nwebsocket
     :alt: Code Coverage
