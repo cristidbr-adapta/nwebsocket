@@ -96,7 +96,7 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
                         await tx_queue.put(None)
 
                 else:
-                    raise Exception(
+                    print(
                         "Do not know how to handle event: " + str(event))
 
         # tx yielded
@@ -121,7 +121,7 @@ async def ws_socket_manage(rx_queue, tx_queue, uri, callback):
 
     # let tx_queue be nonlocal and sleep
     def send(m): return tx_queue.put(m) and time.sleep(1e-5)
-
+    
     # open socket connection
     try:
         socket = await curio.open_connection(endpoint['host'], endpoint['port'], ssl=False)
