@@ -5,6 +5,12 @@ nwebsocket
     :target: https://github.com/cristidbr-adapta/nwebsocket/actions/workflows/CI.yml
     :alt: Continuous Integration
 
+.. image:: https://badge.fury.io/py/nwebsocket.svg
+    :alt: Python Package Index
+
+.. image:: https://img.shields.io/pypi/pyversions/nwebsocket   
+    :alt: PyPI - Python Version
+
 .. image:: https://codecov.io/gh/cristidbr-adapta/nwebsocket/branch/main/graph/badge.svg?token=0ZXGWE8SQZ
     :target: https://codecov.io/gh/cristidbr-adapta/nwebsocket
     :alt: Code Coverage
