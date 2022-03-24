@@ -1,0 +1,27 @@
+[tox]
+envlist = py37, py38, py39, py310, pypy3, lint, docs, packaging
+
+[gh-actions]
+python =
+    3.7: py37
+    3.8: py38
+    3.9: py39
+    3.10: py310, lint, docs, packaging
+    pypy3: pypy3
+
+[testenv]
+passenv =
+    GITHUB_*
+deps =
+    curio>=1.5,<2
+    wsproto>=1.1.0<2
+    pytest>=7.1.1,<8
+    pytest-cov>=3.0.0,<4
+    pytest-xdist>=2.5.0,<3
+commands =
+    pytest --cov-report=xml --cov-report=term --cov=nwebsocket {posargs}
+
+[testenv:pypy3]
+# temporarily disable coverage testing on PyPy due to performance problems
+commands = pytest {posargs}
+

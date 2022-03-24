@@ -1,4 +1,0 @@
-autopep8==1.6.0
-curio==1.5
-wsproto==1.1.0
-pytest==7.1.1
