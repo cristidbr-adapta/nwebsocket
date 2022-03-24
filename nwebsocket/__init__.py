@@ -19,7 +19,7 @@ from wsproto.events import (
 
 from .events import ws_socket_manage
 
-__version__ = '0.9.0'
+__version__ = '0.9.1'
 
 
 class WebSocket(object):
