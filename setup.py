@@ -1,5 +1,4 @@
 """Setuptools entry point."""
-import codecs
 import os
 
 try:
@@ -11,11 +10,9 @@ dirname = os.path.dirname(__file__)
 readme_filename = os.path.join(dirname, 'README.rst')
 
 description = 'WebSocket client without async'
-long_description = description
 
-if os.path.exists(readme_filename):
-    readme_content = codecs.open(readme_filename, encoding='utf-8').read()
-    long_description = readme_content
+with open(readme_filename, 'r', encoding='utf-8') as fh:
+    long_description = fh.read()
 
 setup(name='nwebsocket',
       version='0.9.0',
@@ -32,4 +29,6 @@ setup(name='nwebsocket',
           'wsproto'
       ],
       tests_require=['pytest'],
-      zip_safe=False)
+      zip_safe=False,
+      python_requires=">=3.7"
+)
