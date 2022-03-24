@@ -41,7 +41,7 @@ class WebSocket(object):
         self.onopen = lambda: None
         self.onclose = lambda: None
         self.onerror = lambda: None
-        self.onmessage = lambda: None
+        self.onmessage = lambda _: None
 
         self._send = None
 
@@ -92,7 +92,7 @@ class WebSocket(object):
 
     def handleRXEvent(self, message, send):
         self._send = send
-        
+
         # fire onopen
         if isinstance(message, AcceptConnection):
             self.readyState = WebSocket.OPEN
@@ -106,7 +106,7 @@ class WebSocket(object):
         # closed out
         elif isinstance(message, CloseConnection):
             self.readyState = WebSocket.CLOSED
-            self.onclose(message)
+            self.onclose()
 
         # message
         elif isinstance(message, str):

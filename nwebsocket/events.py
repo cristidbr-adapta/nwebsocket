@@ -103,6 +103,7 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
         else:
             # terminate at None from tx_queue
             if result is None:
+                await rx_queue.put(CloseConnection(0))
                 closed = True
             else:
                 try:

@@ -13,28 +13,32 @@ def test_connect_echo():
     assert sock.readyState == WebSocket.CONNECTING
     
     # flags check
-    open_flag = False 
-    rx_messages = []
+    class Tracker:
+        def __init__( self, wscn ):
+            self.open = False 
+            self.error = False 
+            self.messages = []
 
-    def handle_open():
-        nonlocal open_flag
-        open_flag = True
-    
-    def handle_close():
-        nonlocal open_flag
-        open_flag = False 
+            self.wscn = wscn
+            self.wscn.onopen = self.handle_open
+            self.wscn.onclose = self.handle_close
+            self.wscn.onmessage = self.handle_message
+            self.wscn.onerror = self.handle_error
 
-    def handle_error():
-        nonlocal open_flag
-        open_flag = False 
+        def handle_open( self ):
+            self.open = True 
 
-    def handle_message( m ):
-        rx_messages.append( m )
+        def handle_close( self ):
+            self.open = False
 
-    sock.onopen = handle_open
-    sock.onerror = handle_error
-    sock.onclose = handle_close
-    sock.onmessage = handle_message
+        def handle_error( self ):
+            self.open = False
+            self.error = True 
+
+        def handle_message( self, m ):
+            self.messages.append( m )
+
+    wst = Tracker( sock )
 
     # has connected
     timeout = time.time() + 10.
@@ -42,11 +46,11 @@ def test_connect_echo():
         time.sleep( 1e-4 )
 
     assert sock.readyState == WebSocket.OPEN
-    assert open_flag == True 
+    assert wst.open == True 
 
     # close connection
     sock.close()
-
-    time.sleep( 1. )
     assert sock.readyState == WebSocket.CLOSED
+    assert wst.open == False 
+
     
