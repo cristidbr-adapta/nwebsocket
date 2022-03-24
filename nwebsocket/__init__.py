@@ -82,7 +82,8 @@ class WebSocket(object):
     def close(self):
         self.tx_queue.put(CloseConnection(0))
         self.tx_queue.put(None)
-        time.sleep(1e-5)
+        while(self.readyState != WebSocket.CLOSED ):
+            time.sleep(1e-5)
 
     def join(self):
         if self.detach:
