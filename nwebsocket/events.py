@@ -28,7 +28,7 @@ from .utils import uriparse
 
 async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
     """
-    Manages RX/TX events on the WebSocket using curio.Queue
+    Manages RX/TX events on the WebSocket using curio.Queue and UniversalQueue
     """
 
     # disable nagle
@@ -103,13 +103,15 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
         else:
             # terminate at None from tx_queue
             if result is None:
-                await wscn.close()
                 closed = True
             else:
                 try:
                     await socket.sendall(wscn.send(Message(result)))
                 except BaseException:
                     await tx_queue.put(None)
+
+    # close socket and end task
+    await socket.close()
 
 
 async def ws_socket_manage(rx_queue, tx_queue, uri, callback):
@@ -118,14 +120,14 @@ async def ws_socket_manage(rx_queue, tx_queue, uri, callback):
     """
 
     endpoint = uriparse(uri)
-    secure = ( endpoint['port'] == 443 ) or endpoint.startswith( 'wss:' )
+    secure = endpoint['port'] == 443
 
     # let tx_queue be nonlocal and sleep
     def send(m): return tx_queue.put(m) and time.sleep(1e-5)
-    
+
     # open socket connection
     try:
-        socket = await curio.open_connection(endpoint['host'], endpoint['port'], ssl=secure )
+        socket = await curio.open_connection(endpoint['host'], endpoint['port'], ssl=secure)
     except BaseException:
         callback(RejectConnection(400), send)
         return None
@@ -144,3 +146,6 @@ async def ws_socket_manage(rx_queue, tx_queue, uri, callback):
 
             # fire callback and collect messages
             callback(message, send)
+
+    # end gracefully
+    callback(CloseConnection(0), send)

@@ -79,6 +79,11 @@ class WebSocket(object):
             self._send(message)
             time.sleep(1e-5)
 
+    def close(self):
+        self.tx_queue.put(CloseConnection(0))
+        self.tx_queue.put(None)
+        time.sleep(1e-5)
+
     def join(self):
         if self.detach:
             return None
@@ -87,7 +92,7 @@ class WebSocket(object):
 
     def handleRXEvent(self, message, send):
         self._send = send
-
+        
         # fire onopen
         if isinstance(message, AcceptConnection):
             self.readyState = WebSocket.OPEN
