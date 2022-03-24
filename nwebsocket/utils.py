@@ -17,7 +17,7 @@ def uriparse(uri, default_port=None):
         port = int(info.netloc.split(':')[-1])
     except BaseException:
         if default_port is None:
-            port = 443 if info.scheme == 'wss' else 80 
+            port = 443 if info.scheme == 'wss' else 80
         else:
             port = default_port
 

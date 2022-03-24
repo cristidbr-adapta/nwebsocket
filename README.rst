@@ -1,6 +1,10 @@
 nwebsocket 
 ##########
 
+.. image:: https://codecov.io/gh/cristidbr-adapta/nwebsocket/branch/main/graph/badge.svg?token=0ZXGWE8SQZ
+    :target: https://codecov.io/gh/cristidbr-adapta/nwebsocket
+    :alt: Code Coverage
+
 Python package for simple and easy to use WebSocket clients without async. 
 
 Motivation

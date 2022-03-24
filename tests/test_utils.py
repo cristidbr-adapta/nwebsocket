@@ -1,4 +1,4 @@
-# test_uriparse.py
+# test_utils.py
 
 import pytest
 

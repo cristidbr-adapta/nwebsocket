@@ -19,12 +19,12 @@ from wsproto.events import (
 
 from .events import ws_socket_manage
 
-__version__ = "0.9.0"
+__version__ = '0.9.0'
 
 
 class WebSocket(object):
     """
-    WebSocket for Python
+    WebSocket for Python without async
     """
 
     CONNECTING = 0
@@ -41,7 +41,7 @@ class WebSocket(object):
         self.onopen = lambda: None
         self.onclose = lambda: None
         self.onerror = lambda: None
-        self.onmessage = lambda: None
+        self.onmessage = lambda _: None
 
         self._send = None
 
@@ -66,7 +66,7 @@ class WebSocket(object):
             self.rx_queue,
             self.tx_queue,
             self.uri,
-            lambda m, s: self.handleRXEvent(m, s)
+            lambda m, s: self.handleRXEvent(m, s),
         )
 
         if(self.detach):
@@ -78,6 +78,11 @@ class WebSocket(object):
         else:
             self._send(message)
             time.sleep(1e-5)
+
+    def close(self):
+        self.tx_queue.put(CloseConnection(0))
+        self.tx_queue.put(None)
+        time.sleep(1e-5)
 
     def join(self):
         if self.detach:
@@ -101,7 +106,7 @@ class WebSocket(object):
         # closed out
         elif isinstance(message, CloseConnection):
             self.readyState = WebSocket.CLOSED
-            self.onclose(message)
+            self.onclose()
 
         # message
         elif isinstance(message, str):
