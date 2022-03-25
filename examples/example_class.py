@@ -20,8 +20,8 @@ class WSProtocolLogic(WebSocket):
     def onclose(self):
         print("Closed connection")
 
-    def onerror(self):
-        print("Connection errored out")
+    def onerror(self, e):
+        print("Connection error", e)
 
     def onmessage(self, m):
         self.messages.append(m)
