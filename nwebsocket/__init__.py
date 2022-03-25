@@ -19,7 +19,7 @@ from wsproto.events import (
 
 from .events import ws_socket_manage
 
-__version__ = '0.9.2'
+__version__ = '0.9.3'
 
 
 class WebSocket(object):
@@ -48,6 +48,9 @@ class WebSocket(object):
         # create event queues
         self.rx_queue = Queue()
         self.tx_queue = UniversalQueue()
+
+        # buffer chunks
+        self.buffer = None
 
         # create detachable async context
         def detach(f):
@@ -112,9 +115,12 @@ class WebSocket(object):
         # message
         elif isinstance(message, tuple):
             chunk, complete = message
-            if(not complete):
+
+            if self.buffer is None:
                 self.buffer = chunk
             else:
-                self.onmessage(
-                    self.buffer + chunk if self.buffer is not None else chunk)
+                self.buffer += chunk
+
+            if complete:
+                self.onmessage(self.buffer)
                 self.buffer = None

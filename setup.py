@@ -15,7 +15,7 @@ with open(readme_filename, 'r', encoding='utf-8') as fh:
     long_description = fh.read()
 
 setup(name='nwebsocket',
-      version='0.9.2',
+      version='0.9.3',
       description=description,
       long_description=long_description,
       long_description_content_type='text/x-rst',
