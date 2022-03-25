@@ -85,7 +85,6 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
 
                 # receive message
                 elif isinstance(event, BytesMessage):
-                    print(event)
                     await rx_queue.put((event.data, event.message_finished))
 
                 # handle closures
@@ -118,16 +117,15 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
 
         # tx yielded
         else:
-            print('TX', result)
             # terminate at None from tx_queue
             if result is None:
-                await wscn.close()
+                await rx_queue.put(CloseConnection(0))
                 closed = True
             else:
                 try:
                     m = BytesMessage(result) if isinstance(
                         result, bytes) else TextMessage(result)
-                    print(m)
+
                     await socket.sendall(wscn.send(m))
                 except:
                     await tx_queue.put(None)
@@ -168,8 +166,6 @@ async def ws_socket_manage(rx_queue, tx_queue, uri, callback):
 
             # fire callback and collect messages
             callback(message, send)
-
-        await ws_task.join()
 
     await socket.close()
 
