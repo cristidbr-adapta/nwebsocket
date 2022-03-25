@@ -1,6 +1,6 @@
+# example_minimal.py
 import time
 
-# example_minimal.py
 from nwebsocket import WebSocket
 
 wscn = WebSocket("wss://ws.postman-echo.com/raw")
