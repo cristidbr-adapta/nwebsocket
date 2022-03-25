@@ -90,8 +90,8 @@ def test_send_raise():
     sock = WebSocket('wss://ws.postman-echo.com/raw')
 
     try:
-        sock.send( 'should_fail' )
+        sock.send('should_fail')
     except RuntimeError:
-        raised = True 
-    
-    assert raised == True 
+        raised = True
+
+    assert raised == True

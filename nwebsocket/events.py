@@ -50,8 +50,12 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
     # catch and close connection
     async def manage_rx(socket, blen):
         try:
-            return await socket.recv(blen)
-        except BaseException:
+            data = await socket.recv(blen)
+            if(len(data) == 0):
+                return None
+
+            return data
+        except:
             return None
 
     # closed flag
@@ -71,7 +75,6 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
             wscn.receive_data(result)
 
             for event in wscn.events():
-                print(event)
                 # accepted
                 if isinstance(event, AcceptConnection):
                     await rx_queue.put(event)
@@ -82,30 +85,32 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
 
                 # receive message
                 elif isinstance(event, BytesMessage):
-                    print( event )
+                    print(event)
                     await rx_queue.put((event.data, event.message_finished))
 
                 # handle closures
                 elif isinstance(event, CloseConnection):
+                    await rx_queue.put(event)
+
                     try:
                         await socket.sendall(wscn.send(event.response()))
-                    except BaseException:
+                    except:
                         pass
-                    
-                    await tx_queue.put( None )
 
-                    closed = True 
-                    break 
+                    await tx_queue.put(None)
+
+                    closed = True
+                    break
 
                 # handle pong
                 elif isinstance(event, Pong):
-                    pass 
+                    pass
 
                 # handle ping
                 elif isinstance(event, Ping):
                     try:
                         await socket.sendall(wscn.send(Pong()))
-                    except BaseException:
+                    except:
                         await tx_queue.put(None)
 
                 else:
@@ -113,17 +118,18 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
 
         # tx yielded
         else:
-            print( 'TX', result )
+            print('TX', result)
             # terminate at None from tx_queue
             if result is None:
                 await wscn.close()
                 closed = True
             else:
                 try:
-                    m = BytesMessage(result) if isinstance( result, bytes ) else TextMessage(result)
-                    print( m )
+                    m = BytesMessage(result) if isinstance(
+                        result, bytes) else TextMessage(result)
+                    print(m)
                     await socket.sendall(wscn.send(m))
-                except BaseException:
+                except:
                     await tx_queue.put(None)
 
     # close socket and end task
@@ -139,19 +145,19 @@ async def ws_socket_manage(rx_queue, tx_queue, uri, callback):
     secure = endpoint['port'] == 443
 
     # let tx_queue be nonlocal and sleep
-    def send(m): return tx_queue.put(m) and time.sleep(1e-5)
+    def send(m): return tx_queue.put(m) and time.sleep(1e-3)
 
     # open socket connection
     try:
         socket = await curio.open_connection(endpoint['host'], endpoint['port'], ssl=secure)
-    except BaseException:
+    except:
         callback(RejectConnection(400), send)
         return None
 
     # loop
     async with socket:
-        ws_task = await spawn( ws_events_manage, rx_queue, tx_queue, endpoint, socket )
-            
+        ws_task = await spawn(ws_events_manage, rx_queue, tx_queue, endpoint, socket)
+
         while True:
             # attempt to read incoming messages
             message = await rx_queue.get()
@@ -159,11 +165,13 @@ async def ws_socket_manage(rx_queue, tx_queue, uri, callback):
             # terminate
             if message is None:
                 break
-            
+
             # fire callback and collect messages
-            callback( message, send )
-            
+            callback(message, send)
+
         await ws_task.join()
+
+    await socket.close()
 
     # end gracefully
     callback(CloseConnection(0), send)
