@@ -10,8 +10,10 @@ wscn.onopen = lambda: print( "Opened connection" )
 wscn.onclose = lambda: print( "Closed connection" )
 wscn.onerror = lambda: print( "Connection errored out" )
 
-print( wscn.readyState )
+while( not wscn.readyState ):
+    time.sleep( 1e-4 )
 
 wscn.send( 'text' )
+time.sleep( 1. )
 
-time.sleep( 5. )
+wscn.close()
