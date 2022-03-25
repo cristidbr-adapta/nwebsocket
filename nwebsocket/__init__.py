@@ -82,7 +82,7 @@ class WebSocket(object):
     def close(self):
         self.tx_queue.put(CloseConnection(0))
         self.tx_queue.put(None)
-        while(self.readyState != WebSocket.CLOSED ):
+        while(self.readyState != WebSocket.CLOSED):
             time.sleep(1e-5)
 
     def join(self):
@@ -110,5 +110,11 @@ class WebSocket(object):
             self.onclose()
 
         # message
-        elif isinstance(message, str):
-            self.onmessage(message)
+        elif isinstance(message, tuple):
+            chunk, complete = message
+            if(not complete):
+                self.buffer = chunk
+            else:
+                self.onmessage(
+                    self.buffer + chunk if self.buffer is not None else chunk)
+                self.buffer = None

@@ -77,7 +77,7 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
 
                 # receive message
                 elif isinstance(event, TextMessage):
-                    await rx_queue.put(event.data)
+                    await rx_queue.put((event.data, event.message_finished))
 
                 # handle closures
                 elif isinstance(event, CloseConnection):
