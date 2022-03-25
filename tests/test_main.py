@@ -48,6 +48,17 @@ def test_connect_echo():
     assert sock.readyState == WebSocket.OPEN
     assert wst.open == True 
 
+    # send message and verify echo
+    wst.messages = []
+    sock.send( 'test_0' )
+
+    limit = time.time() + 5.
+    while( len( wst.messages ) == 0 and time.time() < limit ):
+        time.sleep( 1e-4 )
+
+    assert len( wst.messages ) == 1
+    assert wst.messages[ 0 ] == 'test_0'
+
     # close connection
     sock.close()
     assert sock.readyState == WebSocket.CLOSED
