@@ -56,8 +56,9 @@ A simple example without classes
     wscn.onclose = lambda: print( "Closed connection" )
     wscn.onerror = lambda: print( "Connection errored out" )
 
-    print( wscn.readyState )
+    time.sleep( 1. )
 
+    print( wscn.readyState )
     wscn.send( 'text' )
 
 Class protocol 

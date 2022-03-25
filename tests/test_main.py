@@ -83,3 +83,15 @@ def test_messaging_echo():
     sock.close()
     assert sock.readyState == WebSocket.CLOSED
     assert wst.open == False
+
+
+def test_send_raise():
+    raised = False
+    sock = WebSocket('wss://ws.postman-echo.com/raw')
+
+    try:
+        sock.send( 'should_fail' )
+    except RuntimeError:
+        raised = True 
+    
+    assert raised == True 
