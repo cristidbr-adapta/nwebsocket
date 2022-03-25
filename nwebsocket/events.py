@@ -16,11 +16,11 @@ from wsproto.events import (
     AcceptConnection,
     CloseConnection,
     RejectConnection,
-    Message,
     Ping,
     Pong,
     Request,
     TextMessage,
+    BytesMessage,
 )
 
 from .utils import uriparse
@@ -50,8 +50,12 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
     # catch and close connection
     async def manage_rx(socket, blen):
         try:
-            return await socket.recv(blen)
-        except BaseException:
+            data = await socket.recv(blen)
+            if(len(data) == 0):
+                return None
+
+            return data
+        except:
             return None
 
     # closed flag
@@ -79,10 +83,23 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
                 elif isinstance(event, TextMessage):
                     await rx_queue.put((event.data, event.message_finished))
 
+                # receive message
+                elif isinstance(event, BytesMessage):
+                    await rx_queue.put((event.data, event.message_finished))
+
                 # handle closures
                 elif isinstance(event, CloseConnection):
                     await rx_queue.put(event)
-                    await rx_queue.put(None)
+
+                    try:
+                        await socket.sendall(wscn.send(event.response()))
+                    except:
+                        pass
+
+                    await tx_queue.put(None)
+
+                    closed = True
+                    break
 
                 # handle pong
                 elif isinstance(event, Pong):
@@ -92,12 +109,11 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
                 elif isinstance(event, Ping):
                     try:
                         await socket.sendall(wscn.send(Pong()))
-                    except BaseException:
+                    except:
                         await tx_queue.put(None)
 
                 else:
-                    print(
-                        "Do not know how to handle event: " + str(event))
+                    print("Unexpected event: " + str(event))
 
         # tx yielded
         else:
@@ -107,8 +123,11 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
                 closed = True
             else:
                 try:
-                    await socket.sendall(wscn.send(Message(result)))
-                except BaseException:
+                    m = BytesMessage(result) if isinstance(
+                        result, bytes) else TextMessage(result)
+
+                    await socket.sendall(wscn.send(m))
+                except:
                     await tx_queue.put(None)
 
     # close socket and end task
@@ -124,12 +143,12 @@ async def ws_socket_manage(rx_queue, tx_queue, uri, callback):
     secure = endpoint['port'] == 443
 
     # let tx_queue be nonlocal and sleep
-    def send(m): return tx_queue.put(m) and time.sleep(1e-5)
+    def send(m): return tx_queue.put(m) and time.sleep(1e-3)
 
     # open socket connection
     try:
         socket = await curio.open_connection(endpoint['host'], endpoint['port'], ssl=secure)
-    except BaseException:
+    except:
         callback(RejectConnection(400), send)
         return None
 
@@ -147,6 +166,8 @@ async def ws_socket_manage(rx_queue, tx_queue, uri, callback):
 
             # fire callback and collect messages
             callback(message, send)
+
+    await socket.close()
 
     # end gracefully
     callback(CloseConnection(0), send)

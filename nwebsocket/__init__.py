@@ -37,12 +37,6 @@ class WebSocket(object):
         self.detach = detach
         self.readyState = WebSocket.CONNECTING
 
-        # callbacks
-        self.onopen = lambda: None
-        self.onclose = lambda: None
-        self.onerror = lambda: None
-        self.onmessage = lambda _: None
-
         self._send = None
 
         # create event queues
@@ -74,6 +68,18 @@ class WebSocket(object):
 
         if(self.detach):
             self.task = async_detached(self.manage)
+
+    def onopen(self):
+        pass
+
+    def onclose(self):
+        pass
+
+    def onerror(self, error):
+        pass
+
+    def onmessage(self, message):
+        pass
 
     def send(self, message):
         if(self._send is None):

@@ -47,25 +47,68 @@ A simple example without classes
 .. code:: python
 
     # example_minimal.py
-    from nwebsocket import WebSocket 
+    import time
 
-    wscn = WebSocket( "wss://ws.postman-echo.com/raw" )
+    from nwebsocket import WebSocket
 
-    wscn.onmessage = lambda m: print( m )
-    wscn.onopen = lambda: print( "Opened connection" )
-    wscn.onclose = lambda: print( "Closed connection" )
-    wscn.onerror = lambda: print( "Connection errored out" )
+    wscn = WebSocket("wss://ws.postman-echo.com/raw")
 
-    time.sleep( 1. )
+    wscn.onmessage = lambda m: print(m)
+    wscn.onopen = lambda: print("Opened connection")
+    wscn.onclose = lambda: print("Closed connection")
+    wscn.onerror = lambda e: print("Connection error", e)
 
-    print( wscn.readyState )
-    wscn.send( 'text' )
+    while(not wscn.readyState):
+        time.sleep(1e-4)
+
+    wscn.send('text')
+    time.sleep(1.)
+
+    wscn.close()
 
 Class protocol 
 --------------
 
 Example of extending the WebSocket class. 
 
+.. code::python 
+    # example_class.py
+    import time
+
+    from nwebsocket import WebSocket
+
+
+    class WSProtocolLogic(WebSocket):
+        def __init__(self, url):
+            super().__init__(url)
+
+            self.messages = []
+
+            # wait for connection, close or error
+            while(not self.readyState):
+                time.sleep(1e-4)
+
+        def onopen(self):
+            print("Opened connection")
+
+        def onclose(self):
+            print("Closed connection")
+
+        def onerror(self, e):
+            print("Connection error", e)
+
+        def onmessage(self, m):
+            self.messages.append(m)
+
+
+    wscn = WSProtocolLogic("wss://ws.postman-echo.com/raw")
+
+    wscn.send('text')
+    time.sleep(1.)
+
+    print(wscn.messages)
+
+    wscn.close()
 
 
 Motivation
