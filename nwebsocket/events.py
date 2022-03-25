@@ -16,11 +16,11 @@ from wsproto.events import (
     AcceptConnection,
     CloseConnection,
     RejectConnection,
-    Message,
     Ping,
     Pong,
     Request,
     TextMessage,
+    BytesMessage,
 )
 
 from .utils import uriparse
@@ -71,6 +71,7 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
             wscn.receive_data(result)
 
             for event in wscn.events():
+                print(event)
                 # accepted
                 if isinstance(event, AcceptConnection):
                     await rx_queue.put(event)
@@ -79,14 +80,26 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
                 elif isinstance(event, TextMessage):
                     await rx_queue.put((event.data, event.message_finished))
 
+                # receive message
+                elif isinstance(event, BytesMessage):
+                    print( event )
+                    await rx_queue.put((event.data, event.message_finished))
+
                 # handle closures
                 elif isinstance(event, CloseConnection):
-                    await rx_queue.put(event)
-                    await rx_queue.put(None)
+                    try:
+                        await socket.sendall(wscn.send(event.response()))
+                    except BaseException:
+                        pass
+                    
+                    await tx_queue.put( None )
+
+                    closed = True 
+                    break 
 
                 # handle pong
                 elif isinstance(event, Pong):
-                    pass
+                    pass 
 
                 # handle ping
                 elif isinstance(event, Ping):
@@ -96,18 +109,20 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
                         await tx_queue.put(None)
 
                 else:
-                    print(
-                        "Do not know how to handle event: " + str(event))
+                    print("Unexpected event: " + str(event))
 
         # tx yielded
         else:
+            print( 'TX', result )
             # terminate at None from tx_queue
             if result is None:
-                await rx_queue.put(CloseConnection(0))
+                await wscn.close()
                 closed = True
             else:
                 try:
-                    await socket.sendall(wscn.send(Message(result)))
+                    m = BytesMessage(result) if isinstance( result, bytes ) else TextMessage(result)
+                    print( m )
+                    await socket.sendall(wscn.send(m))
                 except BaseException:
                     await tx_queue.put(None)
 
@@ -135,8 +150,8 @@ async def ws_socket_manage(rx_queue, tx_queue, uri, callback):
 
     # loop
     async with socket:
-        ws_task = await spawn(ws_events_manage, rx_queue, tx_queue, endpoint, socket)
-
+        ws_task = await spawn( ws_events_manage, rx_queue, tx_queue, endpoint, socket )
+            
         while True:
             # attempt to read incoming messages
             message = await rx_queue.get()
@@ -144,9 +159,11 @@ async def ws_socket_manage(rx_queue, tx_queue, uri, callback):
             # terminate
             if message is None:
                 break
-
+            
             # fire callback and collect messages
-            callback(message, send)
+            callback( message, send )
+            
+        await ws_task.join()
 
     # end gracefully
     callback(CloseConnection(0), send)
