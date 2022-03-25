@@ -17,15 +17,11 @@ nwebsocket
     :target: https://github.com/cristidbr-adapta/nwebsocket/actions/workflows/CI.yml
     :alt: Continuous Integration
 
-Python package for simple and easy to use WebSocket clients without async. 
+Simple and easy to use syncronous WebSocket client, no async.
 
-Motivation
-==========
+Usable with `Jupyter Notebook`_. 
 
-There are many asynchronous Python WebSocket client packages out there, and 
-almost of them require your code to use the async syntax. This one does not, 
-so it's easier to use from within a Jupyter Notebook. All of the async code 
-is executed onto a separate thread.
+.. _Jupyter Notebook: https://jupyter.org/ 
 
 Installation
 ============
@@ -43,14 +39,17 @@ Python 3.7+ is required.
 Usage
 =====
 
-A simple minimal API interface can be created using the following example.
+Raw API 
+-------
+
+A simple example without classes
 
 .. code:: python
 
-    # minimal.py
+    # example_minimal.py
     from nwebsocket import WebSocket 
 
-    wscn = WebSocket( "ws://localhost:8001" )
+    wscn = WebSocket( "wss://ws.postman-echo.com/raw" )
 
     wscn.onmessage = lambda m: print( m )
     wscn.onopen = lambda: print( "Opened connection" )
@@ -59,12 +58,28 @@ A simple minimal API interface can be created using the following example.
 
     print( wscn.readyState )
 
+    wscn.send( 'text' )
+
+Class protocol 
+--------------
+
+Example of extending the WebSocket class. 
+
+
+
+Motivation
+==========
+
+There are many asynchronous Python WebSocket client packages out there, and 
+almost of them require your code to use the async syntax. This is unfortunate,
+since it will lead to a **run_until_complete** call eventually, which will 
+block the main thread from performing other operations in parrallel.
 
 Inspiration 
 ===========
 
 This package was inspired by the ultra-simple WebSocket API in the JavaScript 
-language which it replicates. 
+language, which it replicates one-to-one.
 
 https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/url
 
