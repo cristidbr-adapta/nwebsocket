@@ -3,11 +3,16 @@ import time
 
 from nwebsocket import WebSocket
 
-class WSProtocol(WebSocket):
-    def __init__(self,url):
-        super.__init__(url)
+
+class WSProtocolLogic(WebSocket):
+    def __init__(self, url):
+        super().__init__(url)
 
         self.messages = []
+
+        # wait for connection, close or error
+        while(not self.readyState):
+            time.sleep(1e-4)
 
     def onopen(self):
         print("Opened connection")
@@ -21,10 +26,8 @@ class WSProtocol(WebSocket):
     def onmessage(self, m):
         self.messages.append(m)
 
-wscn = WSProtocol("wss://ws.postman-echo.com/raw")
 
-while(not wscn.readyState):
-    time.sleep(1e-4)
+wscn = WSProtocolLogic("wss://ws.postman-echo.com/raw")
 
 wscn.send('text')
 time.sleep(1.)
