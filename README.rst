@@ -71,7 +71,7 @@ Class protocol
 
 Example of extending the WebSocket class. 
 
-.. code::python 
+.. code:: python 
     # example_class.py
     import time
 
