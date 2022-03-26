@@ -44,7 +44,7 @@ setup(name='nwebsocket',
           'curio',
           'wsproto'
       ],
-      tests_require=['pytest'],
+      tests_require=['pytest', 'pytest-asyncio'],
       zip_safe=False,
       python_requires=">=3.7",
       )
