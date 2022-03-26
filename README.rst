@@ -9,6 +9,10 @@ nwebsocket
     :target: https://img.shields.io/pypi/pyversions/nwebsocket   
     :alt: PyPI - Python Version
 
+.. image:: https://static.pepy.tech/badge/nwebsocket?    
+    :target: https://static.pepy.tech/badge/nwebsocket 
+    :alt: Download count
+
 .. image:: https://codecov.io/gh/cristidbr-adapta/nwebsocket/branch/main/graph/badge.svg?token=0ZXGWE8SQZ
     :target: https://codecov.io/gh/cristidbr-adapta/nwebsocket
     :alt: Code Coverage
