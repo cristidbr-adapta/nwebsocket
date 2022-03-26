@@ -3,8 +3,14 @@
 pip install wsproto before running this.
 
 """
-from curio import Queue, run, spawn, TaskGroup
+from ast import Bytes
+import curio 
+import threading
+
+from curio import Queue, spawn, TaskGroup
+from curio import tcp_server
 from curio.socket import IPPROTO_TCP, TCP_NODELAY
+
 from wsproto import WSConnection, ConnectionType
 from wsproto.events import (CloseConnection, AcceptConnection, Request,
                             BytesMessage, TextMessage, Message)
@@ -17,6 +23,7 @@ async def ws_adapter(in_q, out_q, client, _):
     client.setsockopt(IPPROTO_TCP, TCP_NODELAY, 1)
     wsconn = WSConnection(ConnectionType.SERVER)
     closed = False
+    buffer = None
 
     # catch and close connection
     async def manage_rx(socket, blen):
@@ -44,7 +51,7 @@ async def ws_adapter(in_q, out_q, client, _):
             for event in wsconn.events():
                 cl = event.__class__
                 if cl in DATA_TYPES:
-                    await in_q.put(event.data)
+                    await in_q.put((event.data, event.message_finished))
                 elif cl is Request:
                     # Auto accept. Maybe consult the handler?
                     await client.sendall(wsconn.send(AcceptConnection()))
@@ -62,11 +69,18 @@ async def ws_adapter(in_q, out_q, client, _):
                 await client.sendall(wsconn.send(CloseConnection(0)))
                 closed = True
             else:
-                await client.sendall(wsconn.send(Message(result)))
+                if(isinstance(result, tuple)):
+                    data, complete = result
+                    if buffer is None:
+                        buffer = data
+                    else:
+                        buffer += data
 
-    print("Bridge done.")
-
-
+                    if complete:
+                        m = BytesMessage(buffer) if isinstance(buffer, bytes) else TextMessage(buffer)
+                        buffer = None
+                        await client.sendall(wsconn.send(m))
+                        
 async def ws_echo_server(in_queue, out_queue):
     """Just echo websocket messages, reversed. Echo 3 times, then close."""
     while True:
@@ -75,7 +89,6 @@ async def ws_echo_server(in_queue, out_queue):
             # The ws connection was closed.
             break
         await out_queue.put(msg)
-    print("Handler done.")
 
 
 def serve_ws(handler):
@@ -86,14 +99,27 @@ def serve_ws(handler):
         await handler(in_q, out_q)
         await out_q.put(None)
         await ws_task.join()  # Wait until it's done.
-        # Curio will close the socket for us after we drop off here.
-        print("Master task done.")
 
     return run_ws
 
+def echo_server( port = 8001 ):
+    print('Listening on port', port)
 
-if __name__ == '__main__':
-    from curio import tcp_server
-    port = 8001
-    print(f'Listening on port {port}.')
-    run(tcp_server, '', port, serve_ws(ws_echo_server))
+    # create detachable async context
+    def detach(f):
+        def wrap(*args):
+            thr = threading.Thread(target=f, args=args)
+            thr.daemon = True
+            thr.start()
+            return thr
+
+        return wrap
+
+    async_detached = detach(curio.run)
+
+    # create thread
+    task = async_detached(tcp_server( '', port, serve_ws(ws_echo_server)))
+
+    return task
+
+
