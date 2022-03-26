@@ -1,10 +1,14 @@
+import sys 
 import time
+
+sys.path.append( '../' )
 
 from nwebsocket import WebSocket
 
 wscn = WebSocket('ws://localhost:8001/')
 
-time.sleep(1.)
+while(not wscn.readyState):
+    time.sleep(1e-4)
 
 wscn.send('test')
 
