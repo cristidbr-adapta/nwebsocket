@@ -32,9 +32,8 @@ class WebSocket(object):
     CLOSING = 2
     CLOSED = 3
 
-    def __init__(self, uri, detach=True):
+    def __init__(self, uri):
         self.uri = uri
-        self.detach = detach
         self.readyState = WebSocket.CONNECTING
 
         self._send = None
@@ -66,8 +65,7 @@ class WebSocket(object):
             lambda m, s: self.handleRXEvent(m, s),
         )
 
-        if(self.detach):
-            self.task = async_detached(self.manage)
+        self.task = async_detached(self.manage)
 
     def onopen(self):
         pass
@@ -93,12 +91,6 @@ class WebSocket(object):
         self.tx_queue.put(None)
         while(self.readyState != WebSocket.CLOSED):
             time.sleep(1e-5)
-
-    def join(self):
-        if self.detach:
-            return None
-
-        return curio.run(self.manage)
 
     def handleRXEvent(self, message, send):
         self._send = send

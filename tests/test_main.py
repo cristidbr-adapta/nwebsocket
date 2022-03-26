@@ -17,6 +17,15 @@ def random_string(length):
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))
 
 
+def test_unable_to_connect():
+    sock = WebSocket('ws://noconnect')
+
+    while(not sock.readyState):
+        time.sleep(1e-4)
+
+    assert sock.readyState == WebSocket.CLOSED
+
+
 def test_messaging_echo():
     sock = WebSocket('wss://ws.postman-echo.com/raw')
 
