@@ -123,8 +123,12 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
                 closed = True
             else:
                 try:
-                    m = BytesMessage(result) if isinstance(
-                        result, bytes) else TextMessage(result)
+                    m = result
+
+                    if isinstance(result, bytes):
+                        m = BytesMessage(result)
+                    elif isinstance(result, str):
+                        m = TextMessage(result)
 
                     await socket.sendall(wscn.send(m))
                 except:

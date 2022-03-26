@@ -1,9 +1,9 @@
-import sys 
+from nwebsocket import WebSocket
+import sys
 import time
 
-sys.path.append( '../' )
+sys.path.append('../')
 
-from nwebsocket import WebSocket
 
 wscn = WebSocket('ws://localhost:8001/')
 

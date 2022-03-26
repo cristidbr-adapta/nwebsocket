@@ -8,6 +8,10 @@ import string
 
 from nwebsocket import WebSocket
 
+from wsproto.events import (
+    Ping,
+)
+
 
 def random_string(length):
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))
@@ -54,6 +58,9 @@ def test_messaging_echo():
 
     assert sock.readyState == WebSocket.OPEN
     assert wst.open == True
+
+    # send ping message
+    sock.send(Ping())
 
     # send small text and verify echo
     wst.messages = []
