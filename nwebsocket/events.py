@@ -60,7 +60,7 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
 
     # closed flag
     while not closed:
-        rx_task = await spawn(manage_rx, socket, 65535)
+        rx_task = await spawn(manage_rx, socket, int(1024*1024))
         tx_task = await spawn(tx_queue.get)
 
         # execute both

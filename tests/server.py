@@ -37,7 +37,7 @@ async def ws_adapter(in_q, out_q, client, _):
             return None
 
     while not closed:
-        wstask = await spawn(manage_rx, client, 65535)
+        wstask = await spawn(manage_rx, client, int(1024*1024))
         outqtask = await spawn(out_q.get)
 
         async with TaskGroup([wstask, outqtask]) as g:
@@ -75,7 +75,7 @@ async def ws_adapter(in_q, out_q, client, _):
                         buffer = data
                     else:
                         buffer += data
-
+                    
                     if complete:
                         m = BytesMessage(buffer) if isinstance(buffer, bytes) else TextMessage(buffer)
                         buffer = None
@@ -122,4 +122,9 @@ def echo_server( port = 8001 ):
 
     return task
 
+if __name__ == '__main__':
+    import time
+    echo_server()
 
+    while(True):
+        time.sleep(1.)
