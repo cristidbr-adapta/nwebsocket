@@ -14,6 +14,7 @@ from wsproto.events import (
 
 from .server import echo_server
 
+
 @pytest.fixture(scope='session')
 def server():
     server = echo_server(8001)
@@ -24,6 +25,8 @@ def random_string(length):
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))
 
 # flags check
+
+
 class Tracker:
     def __init__(self, wscn):
         self.open = False
@@ -120,7 +123,6 @@ def test_messaging_echo_secure(server):
     assert wst.open == False
 
 
-
 def test_messaging_echo_binary(server):
     sock = WebSocket('ws://localhost:8001/')
 
@@ -163,5 +165,3 @@ def test_messaging_echo_binary(server):
     sock.close()
     assert sock.readyState == WebSocket.CLOSED
     assert wst.open == False
-
-

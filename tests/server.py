@@ -4,7 +4,7 @@ pip install wsproto before running this.
 
 """
 from ast import Bytes
-import curio 
+import curio
 import threading
 
 from curio import Queue, spawn, TaskGroup
@@ -75,12 +75,14 @@ async def ws_adapter(in_q, out_q, client, _):
                         buffer = data
                     else:
                         buffer += data
-                    
+
                     if complete:
-                        m = BytesMessage(buffer) if isinstance(buffer, bytes) else TextMessage(buffer)
+                        m = BytesMessage(buffer) if isinstance(
+                            buffer, bytes) else TextMessage(buffer)
                         buffer = None
                         await client.sendall(wsconn.send(m))
-                        
+
+
 async def ws_echo_server(in_queue, out_queue):
     """Just echo websocket messages, reversed. Echo 3 times, then close."""
     while True:
@@ -102,7 +104,8 @@ def serve_ws(handler):
 
     return run_ws
 
-def echo_server( port = 8001 ):
+
+def echo_server(port=8001):
     print('Listening on port', port)
 
     # create detachable async context
@@ -118,9 +121,10 @@ def echo_server( port = 8001 ):
     async_detached = detach(curio.run)
 
     # create thread
-    task = async_detached(tcp_server( '', port, serve_ws(ws_echo_server)))
+    task = async_detached(tcp_server('', port, serve_ws(ws_echo_server)))
 
     return task
+
 
 if __name__ == '__main__':
     import time
