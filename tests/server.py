@@ -81,7 +81,7 @@ async def ws_adapter(in_q, out_q, client, _):
                             buffer, bytes) else TextMessage(buffer)
                         buffer = None
                         await client.sendall(wsconn.send(m))
-                elif(isinstance(result, Ping)):
+                elif(isinstance(result, Ping) or isinstance(result, CloseConnection)):
                     await client.sendall(wsconn.send(result))
 
 

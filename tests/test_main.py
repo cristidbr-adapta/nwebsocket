@@ -10,6 +10,7 @@ from nwebsocket import WebSocket
 
 from wsproto.events import (
     Ping,
+    CloseConnection,
 )
 
 from .server import echo_server
@@ -166,7 +167,11 @@ def test_messaging_echo_binary(server):
 
     # test ping
     server.put(Ping())
-    time.sleep(1.)
+    time.sleep(2.)
+
+    # test close
+    server.put(CloseConnection(0))
+    time.sleep(2.)
 
     # close connection
     sock.close()
