@@ -7,7 +7,7 @@ from ast import Bytes
 import curio
 import threading
 
-from curio import Queue, spawn, TaskGroup
+from curio import Queue, UniversalQueue, spawn, TaskGroup
 from curio import tcp_server
 from curio.socket import IPPROTO_TCP, TCP_NODELAY
 
@@ -84,7 +84,7 @@ async def ws_adapter(in_q, out_q, client, _):
 
 
 async def ws_echo_server(in_queue, out_queue):
-    """Just echo websocket messages, reversed. Echo 3 times, then close."""
+    """Just echo websocket messages"""
     while True:
         msg = await in_queue.get()
         if msg is None:
@@ -93,10 +93,10 @@ async def ws_echo_server(in_queue, out_queue):
         await out_queue.put(msg)
 
 
-def serve_ws(handler):
+def serve_ws(handler, out_q):
     """Start processing web socket messages using the given handler."""
     async def run_ws(client, addr):
-        in_q, out_q = Queue(), Queue()
+        in_q = Queue()
         ws_task = await spawn(ws_adapter, in_q, out_q, client, addr)
         await handler(in_q, out_q)
         await out_q.put(None)
@@ -121,9 +121,11 @@ def echo_server(port=8001):
     async_detached = detach(curio.run)
 
     # create thread
-    task = async_detached(tcp_server('', port, serve_ws(ws_echo_server)))
+    out_q = UniversalQueue()
+    task = async_detached(tcp_server(
+        '', port, serve_ws(ws_echo_server, out_q)))
 
-    return task
+    return task, out_q
 
 
 if __name__ == '__main__':

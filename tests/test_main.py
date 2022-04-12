@@ -17,14 +17,12 @@ from .server import echo_server
 
 @pytest.fixture(scope='session')
 def server():
-    server = echo_server(8001)
+    server = echo_server(8001)[1]
     yield server
 
 
 def random_string(length):
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))
-
-# flags check
 
 
 class Tracker:
@@ -68,17 +66,21 @@ def test_send_raise(server):
 
     try:
         sock.send('should_fail')
-    except RuntimeError:
+    except ConnectionError:
         raised = True
 
     assert raised == True
 
 
 def test_messaging_echo_secure(server):
-    sock = WebSocket('wss://ws.postman-echo.com/raw')
+    endpoint = 'wss://ws.postman-echo.com/raw'
+    sock = WebSocket(endpoint)
 
     # can connect
     assert sock.readyState == WebSocket.CONNECTING
+
+    # test stringification
+    assert str(sock).find('<WebSocket') == 0
 
     wst = Tracker(sock)
 
@@ -157,11 +159,23 @@ def test_messaging_echo_binary(server):
     while(len(wst.messages) == 0 and time.time() < limit):
         time.sleep(1e-4)
 
-    time.sleep(5.)
+    time.sleep(1.)
     assert len(wst.messages) == 1
     assert wst.messages[0] == multipart_binary
+
+    # test ping
+    server.put(Ping())
+    time.sleep(1.)
 
     # close connection
     sock.close()
     assert sock.readyState == WebSocket.CLOSED
     assert wst.open == False
+
+
+def test_socket_options(server):
+    sock = WebSocket('ws://localhost:8001/', dict(maxPayload=365))
+
+    assert sock.options['maxPayload'] == 365
+
+    sock.close()

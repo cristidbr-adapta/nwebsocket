@@ -43,7 +43,8 @@ class WebSocket(object):
         :type options: dict(maxPayload=1024*1024) 
         """
         self.url = url
-        self.options = dict(maxPayload=int(1024*1024)) if ( options is None ) else options
+        self.options = dict(maxPayload=int(1024*1024)
+                            ) if (options is None) else options
         self.readyState = WebSocket.CONNECTING
 
         self._send = None
@@ -78,10 +79,10 @@ class WebSocket(object):
 
         self.task = async_detached(self.manage)
 
-    def __str__( self ):
-        return "<WebSocket url={} readyState={}>".format( self.url )
-    
-    def __repr__( self ):
+    def __str__(self):
+        return "<WebSocket url={} readyState={}>".format(self.url, self.readyState)
+
+    def __repr__(self):
         return self.__str__()
 
     def onopen(self):
