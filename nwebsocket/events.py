@@ -26,7 +26,7 @@ from wsproto.events import (
 from .utils import uriparse
 
 
-async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
+async def ws_events_manage(rx_queue, tx_queue, endpoint, socket, options):
     """
     Manages RX/TX events on the WebSocket using curio.Queue and UniversalQueue
     """
@@ -60,7 +60,7 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
 
     # closed flag
     while not closed:
-        rx_task = await spawn(manage_rx, socket, int(1024*1024))
+        rx_task = await spawn(manage_rx, socket, options['maxPayload'])
         tx_task = await spawn(tx_queue.get)
 
         # execute both
@@ -138,7 +138,7 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket):
     await socket.close()
 
 
-async def ws_socket_manage(rx_queue, tx_queue, uri, callback):
+async def ws_socket_manage(rx_queue, tx_queue, uri, callback, options):
     """
     Manage socket connection
     """
@@ -158,7 +158,7 @@ async def ws_socket_manage(rx_queue, tx_queue, uri, callback):
 
     # loop
     async with socket:
-        ws_task = await spawn(ws_events_manage, rx_queue, tx_queue, endpoint, socket)
+        ws_task = await spawn(ws_events_manage, rx_queue, tx_queue, endpoint, socket, options)
 
         while True:
             # attempt to read incoming messages
