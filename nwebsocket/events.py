@@ -168,6 +168,8 @@ async def ws_socket_manage(rx_queue, tx_queue, uri, callback, options):
             # fire callback and collect messages
             callback(message, send)
 
+        ws_task.join()
+
     await socket.close()
 
     # end gracefully
