@@ -81,6 +81,7 @@ def test_messaging_echo_secure(server):
 
     # test stringification
     assert str(sock).find('<WebSocket') == 0
+    assert repr(sock).find('<WebSocket') == 0
 
     wst = Tracker(sock)
 
@@ -178,4 +179,18 @@ def test_socket_options(server):
 
     assert sock.options['maxPayload'] == 365
 
+    sock.close()
+
+
+def test_onmessage_default(server):
+    sock = WebSocket('ws://localhost:8001/')
+
+    # has connected
+    timeout = time.time() + 10.
+    while(time.time() < timeout and sock.readyState == WebSocket.CONNECTING):
+        time.sleep(1e-4)
+
+    sock.send('test1')
+
+    time.sleep(1.)
     sock.close()

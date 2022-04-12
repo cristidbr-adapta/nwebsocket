@@ -159,7 +159,7 @@ class WebSocket(object):
             self.onclose()
 
         # message
-        elif isinstance(message, tuple):
+        elif isinstance(message, tuple) and len(message) == 2:
             chunk, complete = message
 
             if self.buffer is None:
