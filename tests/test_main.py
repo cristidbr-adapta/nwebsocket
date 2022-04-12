@@ -161,7 +161,10 @@ def test_messaging_echo_binary(server):
     while(len(wst.messages) == 0 and time.time() < limit):
         time.sleep(1e-4)
 
-    time.sleep(5.)
+    limit = time.time() + 5.
+    while(limit > time.time()):
+        time.sleep(1e-3)
+
     assert len(wst.messages) == 1
     assert wst.messages[0] == multipart_binary
 
