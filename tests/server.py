@@ -13,7 +13,7 @@ from curio.socket import IPPROTO_TCP, TCP_NODELAY
 
 from wsproto import WSConnection, ConnectionType
 from wsproto.events import (CloseConnection, AcceptConnection, Request,
-                            BytesMessage, TextMessage, Message)
+                            BytesMessage, TextMessage, Ping)
 
 DATA_TYPES = (BytesMessage, TextMessage)
 
@@ -81,6 +81,8 @@ async def ws_adapter(in_q, out_q, client, _):
                             buffer, bytes) else TextMessage(buffer)
                         buffer = None
                         await client.sendall(wsconn.send(m))
+                elif(isinstance(result, Ping)):
+                    await client.sendall(wsconn.send(result))
 
 
 async def ws_echo_server(in_queue, out_queue):
