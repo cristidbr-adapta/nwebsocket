@@ -112,9 +112,6 @@ async def ws_events_manage(rx_queue, tx_queue, endpoint, socket, options):
                     except:
                         await tx_queue.put(None)
 
-                else:
-                    print("Unexpected event: " + str(event))
-
         # tx yielded
         else:
             # terminate at None from tx_queue
